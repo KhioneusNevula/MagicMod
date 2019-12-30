@@ -1,7 +1,5 @@
 package com.gm910.magicmod.capabilities.souls;
 
-import com.gm910.magicmod.capabilities.wizard.IWizard;
-
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

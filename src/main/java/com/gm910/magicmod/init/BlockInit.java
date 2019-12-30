@@ -17,13 +17,11 @@ import com.gm910.magicmod.blocks.machine.BlockPentaExtend.TileEntityPentaEx;
 import com.gm910.magicmod.blocks.machine.BlockPentacle;
 import com.gm910.magicmod.blocks.machine.BlockSheol;
 import com.gm910.magicmod.blocks.machine.BlockSheol.TileEntityTeleSheol;
-import com.gm910.magicmod.blocks.machine.BlockWizardifier;
 import com.gm910.magicmod.blocks.machine.MagicGenerator;
 import com.gm910.magicmod.blocks.te.TileEntityPentacle;
 import com.gm910.magicmod.deity.util.Deity;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -37,8 +35,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class BlockInit {
 	
 	public static final List<Block> BLOCKS = new ArrayList<Block>();
-	
-	public static final Block WIZARDIFIER = new BlockWizardifier("wizardifier", Material.ROCK);
+
 	public static final Block ORE_OVERWORLD = new BlockOres("ore_overworld", "overworld");
 	public static final Block ORE_END = new BlockOres("ore_end", "end");
 	public static final Block ORE_NETHER = new BlockOres("ore_nether", "nether");

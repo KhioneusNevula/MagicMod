@@ -14,10 +14,6 @@ import com.gm910.magicmod.capabilities.villagereligion.IVillageReligion;
 import com.gm910.magicmod.capabilities.villagereligion.VReligionProvider;
 import com.gm910.magicmod.capabilities.villagereligion.VillageReligion;
 import com.gm910.magicmod.capabilities.villagereligion.VillageReligionStorage;
-import com.gm910.magicmod.capabilities.wizard.IWizard;
-import com.gm910.magicmod.capabilities.wizard.WizardMagic;
-import com.gm910.magicmod.capabilities.wizard.WizardProvider;
-import com.gm910.magicmod.capabilities.wizard.WizardStorage;
 import com.gm910.magicmod.deity.capability.DeityDataLoader;
 import com.gm910.magicmod.deity.capability.DeityDataProvider;
 import com.gm910.magicmod.deity.capability.DeityDataStorage;
@@ -39,7 +35,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @EventBusSubscriber
 public class CapabilityInit {
 	
-	public static final ResourceLocation WIZ_CAP = new ResourceLocation(MagicMod.MODID, "cap_wizard");
 	public static final ResourceLocation SOUL_CAP = new ResourceLocation(MagicMod.MODID, "cap_soul");
 	public static final ResourceLocation REL_CAP = new ResourceLocation(MagicMod.MODID, "cap_village_religion");
 	public static final ResourceLocation DEITY_CAP = new ResourceLocation(MagicMod.MODID, "cap_deitydata");
@@ -48,7 +43,6 @@ public class CapabilityInit {
 	@SubscribeEvent
 	public static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
 		if ((event.getObject() instanceof EntityPlayer)) {
-			event.addCapability(WIZ_CAP, new WizardProvider());
 			event.addCapability(SOUL_CAP, new SoulProvider());
 		}
 		if (event.getObject() instanceof EntityLivingBase) {
@@ -83,7 +77,6 @@ public class CapabilityInit {
 	
 	@SuppressWarnings("deprecation")
 	public static void preInit() {
-		CapabilityManager.INSTANCE.register(IWizard.class, new WizardStorage(), WizardMagic.class);
 		CapabilityManager.INSTANCE.register(ISouls.class, new SoulsStorage(), Souls.class);
 		CapabilityManager.INSTANCE.register(IVillageReligion.class, new VillageReligionStorage(), VillageReligion.class);
 		CapabilityManager.INSTANCE.register(IDeityData.class, new DeityDataStorage(), DeityDataLoader.class);

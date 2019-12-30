@@ -100,7 +100,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@EventBusSubscriber
 public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInventoryChangedListener, IMerchant {
 	private ResourceLocation unlocName;
 	private String displayName;
@@ -111,7 +110,7 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	//private ServerPos altarPos;
 	private EntityPlayer opposition;
 	private EntityPlayer bester;
-	private ServerPos prevPos = null;
+	private com.gm910.magicmod.deity.util.ServerPos prevPos = null;
 	public MinecraftServer server;
 	private Map<UUID, Integer> favorPerPlayer = new HashMap<UUID, Integer>();
 	private Map<UUID, Double> worship = new HashMap<UUID, Double>();
@@ -122,10 +121,10 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	private ArrayList<Class<? extends Quest>> requiredQuests = new ArrayList<Class<? extends Quest>>();
 	private Map<UUID, Quest> quests = new HashMap<UUID, Quest>();
 	private ArrayList<Class<? extends EntityLivingBase>> naturallyDevout = new ArrayList<Class<? extends EntityLivingBase>>();
-	private RenderDeityBase overrideRender = null;
+	private com.gm910.magicmod.deity.entities.RenderDeityBase overrideRender = null;
 	protected ResourceLocation textureOverride = new ResourceLocation(MagicMod.MODID + ":textures/entity/goeturge.png");
 	private ArrayList<EntityLivingBase> projections = new ArrayList<EntityLivingBase>();
-	private BlockStatue statue;
+	private com.gm910.magicmod.blocks.BlockStatue statue;
 	private ArrayList<ServerPos> statues = new ArrayList<ServerPos>();
 	private ArrayList<ServerPos> villageStatues = new ArrayList<ServerPos>();
 	public Pronoun pro = Pronoun.THEY;

@@ -16,7 +16,6 @@ import com.gm910.magicmod.capabilities.souls.SoulProvider;
 import com.gm910.magicmod.capabilities.souls.Souls;
 import com.gm910.magicmod.capabilities.villagereligion.IVillageReligion;
 import com.gm910.magicmod.capabilities.villagereligion.VReligionProvider;
-import com.gm910.magicmod.capabilities.wizard.WizardProvider;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.capability.DeityDataProvider;
 import com.gm910.magicmod.deity.capability.IDeityData;
@@ -185,10 +184,7 @@ public class EventHandler {
 	
 	@SubscribeEvent
 	public static void update(PlayerTickEvent event) {
-		if (event.player.getCapability(WizardProvider.WIZ_CAP, null).getMagicPower() <= 0) {
-			event.player.setHealth(0);
-			event.player.setDead();
-		}
+		
 		if (!event.player.getEntityWorld().isRemote) {
 			deadSouls(event);
 		}
