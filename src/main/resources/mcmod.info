@@ -1,0 +1,16 @@
+[
+{
+  "modid": "magicmod",
+  "name": "GM910's Magic Mod",
+  "description": "stuff",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["GameCraft910"],
+  "credits": "yo",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

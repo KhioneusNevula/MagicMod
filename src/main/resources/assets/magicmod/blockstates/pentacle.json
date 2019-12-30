@@ -1,0 +1,14 @@
+{
+	"defaults" : {
+		"textures": {
+			"all" : "magicmod:blocks/pentacle"
+		}
+	},
+    "variants": {
+        "normal": [
+            {
+            	"model": "magicmod:pentacle" 
+            }
+        ]
+    }
+}

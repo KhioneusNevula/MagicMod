@@ -1,0 +1,129 @@
+#PARSE_ESCAPES
+sp.dim=en dimensi\u00F3n
+
+#Items
+item.wizardifier_core.name=N\u00FAcleo de Brujificador
+item.demon_orb.name=Orbe de Demonio
+item.chasmator.name=Chasmafactor
+item.blood_orb.name=Orbe de Sangre
+item.god_killer.name=Matador de Dios (Debug)
+item.soul.name=Alma
+soul.soulof=Alma de %s
+soul.soulless=Sin Alma
+item.holy_book.name=Libro Sagrado de %s
+item.holy_book.devoted=Ahora est\u00E1s devoto a %s
+item.holy_book.enemy= C\u00F3mo te atreves a tocar el libro sagrado de %s?
+item.statue.name=Estatua/Efigie de %s
+
+#God Quest
+item.rain_horn.name=Bocina de Lluvia
+item.kraken_tentacle.name=Tent\u00E1culo del Kraken
+
+#Entities
+entity.basic_demon.name=Forjador (Demonio)
+entity.imp.name=Duende (Demonio)
+entity.cacodemon.name=Cacodemonio
+entity.goeturge.name=Goeturgo (Demonio)
+entity.azraelite.name=Azraeleo (Demonio)
+entity.gatekeeper.name=Demonio Portero
+entity.deity.name=Deidad
+entity.kraken.name=Kraken
+entity.hell_portal.name=Portal a She'ol
+
+#Blocks
+tile.chasma.name=Chasma
+tile.sheol.name=Teletransportador a She'ol
+tile.holy_tile.name=Azulejos Sagrados
+tile.pentacle.name=Pent\u00E1culo
+tile.wizardifier.name=Brujificador
+tile.magic_generator.name=Generador de Magia
+
+#Deity-Related
+deity.questitemtooltip=Art\u00EDculo de B\u00FAsqueda de %s
+deity.title=%1$s de %2$s
+deity.nowdevotedto=Ahora est\u00E1s devoto a %s
+deity.nowenemyto=Ahora est\u00E1s enemigo a %s
+deity.notdevoutto=Todav\u00EDa no est\u00E1s devoto a %s
+deity.chestof=Cofre de %s
+deity.i=Yo
+deity.me=M\u00ED
+deity.my=Mi
+deity.mine=M\u00EDo
+deity.they=Ellu
+deity.they_plural=Ellos
+deity.them=Ellu
+deity.them_plural=Ellos
+deity.their=Su
+deity.their_plural=Su
+deity.theirs=Suyo
+deity.theirs_plural=Suyo
+deity.deity=Deidad
+deity.we=Nosotros
+deity.our=Nuestro
+deity.ours=Nuestro
+deity.collective=Deidad Colectiva
+deity.he=\u00C9l
+deity.him=\u00C9l
+deity.his=Su
+deity.his_adj=Suyo
+deity.she=Ella
+deity.her=Su
+deity.her_ob=Ella
+deity.hers=Suyo
+deity.god=Dios
+deity.goddess=Diosa
+deity.them_pluralselves=Ellos Mismos
+deity.themself=Ellu Mismu
+deity.himself=\u00C9l Mismo
+deity.her_obself=Ella Misma
+deity.nowpriestof=Ahora est\u00E1s un sacerdote de %s
+deity.nolongerpriest=Todav\u00EDa no est\u00E1s sacerdote de %s!
+deity.isdead=%1$s de %2$s, %3$s est\u00E1 muerto
+deity.youarenow=Ahora est\u00E1s %1$s de %2$s, %3$s
+deity.hasbeensummoned=%1$s de %2$s, %3$s, ha estado convocado a %4$s!
+deity.cannotsummon=%1$s %2$s no puede estar convocado en esta hora
+deity.curseeffect=Maldici\u00F3n de %s
+deity.blessingeffect=Bendici\u00F3n de %s
+deity.potion=Botella de %s
+deity.splashpotion=Zona de Efecto de %s
+deity.lingeringpotion=Difusor de %s
+deity.tippedarrow.cursed=Flecha Maldicha de %s
+deity.tippedarrow.blessing=Flecha Bendicha de %s
+
+#Leviathan
+deity.domain.ocean=Oc\u00E9ano
+deity.leviathan.rainsummoner=Ahora est\u00E1s un convocador de lluvia de Leviathan!
+
+#Sear
+deity.domain.civilization=Civilizaci\u00F3n
+
+#Spell-Related
+spell.canceled=El hechizo ha estado cancelado por fuerzas m\u00EDsticas
+spell.reboundmessage=Hechizo requiere demasiado mucha magia, pent\u00E1culo tiene solo %1$s merlynes de magia, %2$s merlynes son necesarios. Tomando %3$s merlynes de poder magia de la fuerza vital de hechicero
+spell.success=%sHechizo exitoso
+spell.conditionnotmet=%sNo se puede hechizar, una condici\u00F3n no ha estado satisfecho
+spell.wrongitems=%sNo se puede hechizar, art\u00EDculos incorrectos
+spell.notinsheol=Convocar de pent\u00E1culo no se funciona en She'ol
+spell.dysfunctional=El mundo es disfuncional y el demonio no desea graciarte con su presencia
+
+#Damage Sources
+damage.hellish=%s quem\u00F3 en el fuego del infierno
+damage.holy=%s estaba matado de divinidad
+damage.generic_spell=%s estaba matado de magia cruda
+damage.godcurse=%1$s estaba castigado del poder divino de %2$s %3$s!
+damage.ghost=%2$s asust\u00F3 a %1$s hasta \u00C9l se muri\u00F3
+damage.demon=%1$s recibi\u00F3 infierno de %2$s
+damage.spell=%s estaba matado de un hechizo
+damage.rebound=%s trat\u00F3 a hechizar un hechizo tan poderoso y se muri\u00F3
+
+#Pentacle
+pentacle.statusmessage=%1$s merlynes de poder ahorrado, hechicero es %2$s
+p.none=No hay
+
+#MagicGenerator
+magicgenerator.statusmessage=%1$s merlynes de poder, alcance de %2$s bloques
+
+#Keys
+key.divine.category=Teclas del Sistema Dios
+key.inventory.desc=Abrir Inventorio de Dios
+key.trade.desc=Abrir Men\u00FA de Intercambio

@@ -1,0 +1,128 @@
+sp.dim=in dimension
+
+#Items
+item.wizardifier_core.name=Wizardifier Core
+item.demon_orb.name=Demon Orb
+item.chasmator.name=Chasmafactor
+item.blood_orb.name=Blood Orb
+item.god_killer.name=God Killer (Debug)
+item.soul.name=Soul
+soul.soulof=Soul of %s
+soul.soulless=Soulless
+item.holy_book.name=Holy Book of %s
+item.holy_book.devoted=You are now devout to %s
+item.holy_book.enemy=How dare you touch the holy book of %s?
+item.statue.name=Statue/Effigy of %s
+
+#GodQuestItem
+item.rain_horn.name=Rain Horn
+item.kraken_tentacle.name=Kraken Tentacle
+
+#Entities
+entity.basic_demon.name=Forger Demon
+entity.imp.name=Imp Demon
+entity.cacodemon.name=Cacodemon
+entity.goeturge.name=Goeturge Demon
+entity.azraelite.name=Azraelite Demon
+entity.gatekeeper.name=Gatekeeper Demon
+entity.deity.name=Deity
+entity.kraken.name=Kraken
+entity.hell_portal.name=Portal to She'ol
+
+#Blocks
+tile.chasma.name=Chasma
+tile.sheol.name=Teleporter to She'ol
+tile.holy_tile.name=Holy Tiles
+tile.pentacle.name=Pentacle
+tile.wizardifier.name=Wizardifier
+tile.magic_generator.name=Magic Generator
+
+#Deity-Related
+deity.questitemtooltip=%s Quest Item
+deity.title=%1$s of %2$s
+deity.nowdevotedto=You are now devoted to %s
+deity.nowenemyto=You are now an enemy to %s
+deity.notdevoutto=You are no longer devout to %s
+deity.chestof=Chest of %s
+deity.i=I
+deity.me=Me
+deity.my=My
+deity.mine=Mine
+deity.they=They
+deity.they_plural=They
+deity.them=Them
+deity.them_plural=Them
+deity.their=Their
+deity.their_plural=Their
+deity.theirs=Theirs
+deity.theirs_plural=Theirs
+deity.deity=Deity
+deity.we=We
+deity.our=Our
+deity.ours=Ours
+deity.collective=Collective Deity
+deity.he=He
+deity.him=Him
+deity.his=His
+deity.his_adj=His
+deity.she=She
+deity.her=Her
+deity.her_ob=Her
+deity.hers=Hers
+deity.god=God
+deity.goddess=Goddess
+deity.them_pluralselves=Themselves
+deity.themself=Themself
+deity.himself=Himself
+deity.her_obself=Herself
+deity.nowpriestof=You are now a priest of %s
+deity.nolongerpriest=You are no longer a priest of %s!
+deity.isdead=The %1$s of %2$s, %3$s is dead
+deity.youarenow=You are now the %1$s of %2$s, %3$s
+deity.hasbeensummoned=The %1$s of %2$s, %3$s, has been summoned to %4$s!
+deity.cannotsummon=The %1$s %2$s cannot be summoned at this time
+deity.curseeffect=%s's Curse
+deity.blessingeffect=%s's Blessing
+deity.potion=Bottle of %s
+deity.splashpotion=Area-Effect of %s
+deity.lingeringpotion=Diffuser of %s
+deity.tippedarrow.cursed=Cursed Arrow of %s
+deity.tippedarrow.blessing=Blessed Arrow of %s
+
+#Leviathan
+deity.domain.ocean=Ocean
+deity.leviathan.rainsummoner=You are now a Rain Summoner of Leviathan!
+
+#Sear
+deity.domain.civilization=Civilization
+
+#Spell-Related
+spell.canceled=Spell was canceled by mystic forces
+spell.reboundmessage=Spell requires too much magic, pentacle has only accumulated %1$s merlynes of magic, where %2$s merlynes are necessary. Taking %3$s merlynes of magic power from caster's life power
+spell.success=%sSpell successful!
+spell.conditionnotmet=%sCannot cast spell, some condition is not met
+spell.wrongitems=%sCannot cast spell, incorrect items!
+spell.notinsheol=Pentacle summoning does not work in She'ol
+spell.dysfunctional=Your world is dysfunctional and the demon wishes not to grace you with its presence
+
+#Damage Sources
+damage.hellish=%s burned in hellfire
+damage.holy=%s was killed by divinity
+damage.generic_spell=%s was killed by raw magic
+damage.godcurse=%1$s was smitten by the divine power of the %2$s %3$s!
+damage.ghost=%1$s was spooked to death by %2$s
+damage.demon=%1$s got hell from %2$s
+damage.spell=%s was killed by a magic spell
+damage.rebound=%s tried to cast a spell that was too powerful and was killed as a result
+
+#Pentacle
+pentacle.statusmessage=%1$s merlynes of power stored, caster is %2$s
+p.none=None
+
+#MagicGenerator
+magicgenerator.statusmessage=%1$s merlynes of power, range of %2$s blocks
+
+#Keys
+key.divine.category=God-System Keys
+key.inventory.desc=Open God's Inventory
+key.trade.desc=Open God's Trade Menu (some deities)
