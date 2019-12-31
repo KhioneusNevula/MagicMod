@@ -3,6 +3,7 @@ package com.gm910.magicmod.blocks.te;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.blocks.machine.BlockPentaExtend;
 import com.gm910.magicmod.blocks.machine.CustomEnergyStorage;
 import com.gm910.magicmod.blocks.machine.IMagicEnergy;
@@ -11,11 +12,11 @@ import com.gm910.magicmod.handling.MagicHandler;
 import com.gm910.magicmod.init.BlockInit;
 import com.gm910.magicmod.init.DimensionInit;
 import com.gm910.magicmod.items.ItemBloodOrb;
+import com.gm910.magicmod.magicdamage.EntityDemonLightning;
 import com.gm910.magicmod.proxy.CommonProxy;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -93,7 +94,7 @@ public class TileEntityPentacle extends TileEntity implements ITickable, IMagicE
 			if (world.provider.getDimension() == DimensionInit.DIMENSION_SHEOL) {
 				for (int x = -1; x <= 1; x++) {
 					for (int z = -1; z <= 1; z++) {
-						world.setBlockToAir(new BlockPos(this.getPos().getX() + x, this.getPos().getY(), this.getPos().getZ()+z));
+						//world.setBlockToAir(new BlockPos(this.getPos().getX() + x, this.getPos().getY(), this.getPos().getZ()+z));
 					}
 				}
 				return;
@@ -238,10 +239,10 @@ public class TileEntityPentacle extends TileEntity implements ITickable, IMagicE
 					boolean c = false;
 					if (!stacks.isEmpty()) {
 						for (ItemStack en : stacks) {
-							System.out.println(en + "\n" + (incantation.equals(MagicHandler.BLOOD_ORB.getIncantation())));
-							if (en.getItem() instanceof ItemBloodOrb && incantation.equals(MagicHandler.BLOOD_ORB.getIncantation())) {
+							System.out.println(en + "\n" + (incantation.equals(MagicMod.magic().BLOOD_ORB.getIncantation())));
+							if (en.getItem() instanceof ItemBloodOrb && incantation.equals(MagicMod.magic().BLOOD_ORB.getIncantation())) {
 								System.out.println("Running daemon ego");
-								MagicHandler.BLOOD_ORB.runSpell(world, this.getPos(), null, stacks);
+								MagicMod.magic().BLOOD_ORB.runSpell(world, this.getPos(), null, stacks);
 								//this.setDemon_orb(en.copy());
 								
 								c = true;
@@ -335,13 +336,15 @@ public class TileEntityPentacle extends TileEntity implements ITickable, IMagicE
 	
 	public void demonDismiss() {
 		if (demon != null) {
+			getWorld().addWeatherEffect(new EntityDemonLightning(getWorld(), demon, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), true, false));
 			demon.setDead();
 			demon = null;
+			EntityItem it = new EntityItem(getWorld(), getPos().getX(), getPos().getY() + 2, getPos().getZ(), demon_orb);
+			getWorld().spawnEntity(it);
 		}
-		getWorld().addWeatherEffect(new EntityLightningBolt(getWorld(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), true));
+		
 		incantation = "";
-		EntityItem it = new EntityItem(getWorld(), getPos().getX(), getPos().getY() + 2, getPos().getZ(), demon_orb);
-		getWorld().spawnEntity(it);
+		
 	}
 
 	@Override

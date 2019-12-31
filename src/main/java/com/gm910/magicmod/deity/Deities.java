@@ -19,22 +19,33 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 //-4341446870352739196
+
 public class Deities {
 	
+	public ArrayList<Class<? extends Quest>> questTypes = new ArrayList<Class<? extends Quest>>();
 	
-	
-	public static ArrayList<Class<? extends Quest>> questTypes = new ArrayList<Class<? extends Quest>>();
-	
-	public static final List<Deity> deities = new ArrayList<Deity>();
-	public static ArrayList<Class<? extends EntityLivingBase>> naturallyDevout = new ArrayList<Class<? extends EntityLivingBase>>();
+	public final List<Deity> deities = new ArrayList<Deity>();
+	public ArrayList<Class<? extends EntityLivingBase>> naturallyDevout = new ArrayList<Class<? extends EntityLivingBase>>();
 	
 	//public static final Deity SIMPLE_TRADER = (new DeityTrader(new ResourceLocation(MagicMod.MODID, "simpler_trader"), "Simple Trader", false, new ItemStack(Items.APPLE, 1))).putTrade(new ItemStack(Items.APPLE, 1), new ItemStack(Items.BANNER, 1));
-	public static final Deity LEVIATHAN = new DeityLeviathan(new ResourceLocation(MagicMod.MODID, "leviathan"), "Leviathan", false, false, new ItemStack(Items.WATER_BUCKET, 1));
-	public static final Deity SEAR = new DeityVillager(new ResourceLocation(MagicMod.MODID, "sear"), "Sear", false, false, new ItemStack(Items.EMERALD, 10));
+	public Deity LEVIATHAN;
+	public Deity SEAR;
+	
+	public void initDeities() {
+		//registerDeity(SIMPLE_TRADER);
+		registerAllDeities(
+				
+				LEVIATHAN = new DeityLeviathan(new ResourceLocation(MagicMod.MODID, "leviathan"), "Leviathan", false, false, new ItemStack(Items.WATER_BUCKET, 1)),
+				SEAR = new DeityVillager(new ResourceLocation(MagicMod.MODID, "sear"), "Sear", false, false, new ItemStack(Items.EMERALD, 10))
 		
-	public static Deity getByResourceLocation(ResourceLocation rl) {
+		);
+	}
+	
+	public Deity getByResourceLocation(ResourceLocation rl) {
 		for (Deity d : deities) {
 			if (d.getUnlocName().equals(rl)) {
 				return d;
@@ -43,17 +54,17 @@ public class Deities {
 		return null;
 	}
 	
-	public static void registerQuestType(Class<? extends Quest> questType) {
+	public void registerQuestType(Class<? extends Quest> questType) {
 		questTypes.add(questType);
 	}
 	
-	public static void registerNaturallyDevout(Class<? extends EntityLivingBase> dev) {
+	public void registerNaturallyDevout(Class<? extends EntityLivingBase> dev) {
 		if (!naturallyDevout.contains(dev)) {
 			naturallyDevout.add(dev);
 		}
 	}
 
-	public static Deity fromString(String unlocName) {
+	public Deity fromString(String unlocName) {
 		if (!deities.isEmpty()) {
 			for (Deity d : deities) {
 				if (d.getUnlocName().equals(new ResourceLocation(unlocName))) {
@@ -64,7 +75,7 @@ public class Deities {
 		return null;
 	}
 	
-	public static void summonDeity(WorldServer world, EntityLivingBase summoner, BlockPos pos, ArrayList<EntityItem> itemEntities) {
+	public void summonDeity(WorldServer world, EntityLivingBase summoner, BlockPos pos, ArrayList<EntityItem> itemEntities) {
 		if (deities.isEmpty()) return;
 		for (Deity d : deities) {
 			//System.out.println(d);
@@ -74,19 +85,20 @@ public class Deities {
 			}
 		}
 	}
+
 	
-	public static void initDeities() {
-		//registerDeity(SIMPLE_TRADER);
-		registerDeity(LEVIATHAN);
-		registerDeity(SEAR);
+	public void registerDeity(Deity d) {
+		deities.add(d);
 	}
 	
-	public static void registerDeity(Deity d) {
-		deities.add(d);
+	public void registerAllDeities(Deity...deities) {
+		for (Deity deity : deities) {
+			registerDeity(deity);
+		}
 	}
 
 		
-		public static void readFromNBT(NBTTagCompound nbt) {
+		public void readFromNBT(NBTTagCompound nbt) {
 			//resetDeities();
 			//System.out.println("Reading from nbt");
 			NBTTagList list = nbt.getTagList("DeityList", NBT.TAG_COMPOUND);
@@ -103,7 +115,7 @@ public class Deities {
 			}
 		}
 		
-		public static void resetDeities() {
+		public void resetDeities() {
 			System.out.println("Resetting deitydata");
 			for (Deity d : deities) {
 				d.reset();
@@ -111,7 +123,7 @@ public class Deities {
 		}
 		
 		
-		public static NBTTagCompound writeToNBT(NBTTagCompound compound) {
+		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 			NBTTagList list = new NBTTagList();
 			
 			for (Deity deity : deities) {

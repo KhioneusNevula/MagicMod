@@ -16,6 +16,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockChasma extends Block {
 
@@ -100,6 +102,7 @@ public class BlockChasma extends Block {
         return EnumPushReaction.IGNORE;
     }
 	
+	@SideOnly(Side.CLIENT)
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		// TODO Auto-generated method stub

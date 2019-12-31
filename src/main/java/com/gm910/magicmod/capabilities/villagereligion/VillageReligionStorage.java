@@ -1,5 +1,6 @@
 package com.gm910.magicmod.capabilities.villagereligion;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.ServerPos;
 
@@ -35,7 +36,7 @@ public class VillageReligionStorage implements IStorage<IVillageReligion> {
 			instance.setPriestID(tag.getUniqueId("Priest"));
 		}
 		if (tag.hasKey("Religion")) {
-			instance.setReligion(Deities.fromString(tag.getString("Religion")));
+			instance.setReligion(MagicMod.deities().fromString(tag.getString("Religion")));
 		}
 		
 		if (tag.hasKey("Village")) {

@@ -1086,9 +1086,9 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	 * @return
 	 */
 	public Deity addNaturallyDevout(Class<? extends EntityLivingBase> clasz) {
-		if (!this.naturallyDevout.contains(clasz) && !Deities.naturallyDevout.contains(clasz)) {
+		if (!this.naturallyDevout.contains(clasz) && !MagicMod.deities().naturallyDevout.contains(clasz)) {
 			this.naturallyDevout.add(clasz);
-			Deities.registerNaturallyDevout(clasz);
+			MagicMod.deities().registerNaturallyDevout(clasz);
 		}
 		return this;
 	}
@@ -1192,8 +1192,8 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 			if (!requiredQuests.contains(s)) {
 				requiredQuests.add(s);
 			}
-			if (!Deities.questTypes.contains(s)) {
-				Deities.questTypes.add(s);
+			if (!MagicMod.deities().questTypes.contains(s)) {
+				MagicMod.deities().questTypes.add(s);
 			}
 		}
 	}
@@ -2495,7 +2495,7 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 		public static Quest fromNBT(NBTTagCompound comp, Deity d) {
 			String clas = comp.getString("Type");
 			Class<? extends Quest> clazz = null;
-			for (Class<? extends Quest> q : Deities.questTypes) {
+			for (Class<? extends Quest> q : MagicMod.deities().questTypes) {
 				if (clas.equalsIgnoreCase(q.toString())) {
 					clazz = q;
 				}
@@ -2899,7 +2899,7 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 
 		@Override
 		public DivineInventory valueFromNBT(NBTTagCompound nbt, NBTTagCompound key) {
-			DivineInventory handler = new DivineInventory(nbt.getString("CustomName"), nbt.getUniqueId("Owner"), Deities.fromString(nbt.getString("Deity")),nbt.getBoolean("CustomNameTrue"), nbt.getInteger("Size"));
+			DivineInventory handler = new DivineInventory(nbt.getString("CustomName"), nbt.getUniqueId("Owner"), MagicMod.deities().fromString(nbt.getString("Deity")),nbt.getBoolean("CustomNameTrue"), nbt.getInteger("Size"));
 			NBTTagList list = nbt.getTagList("Handler", NBT.TAG_COMPOUND);
 			for (int i = 0; i < list.tagCount(); i++) {
 				ItemStack stack = new ItemStack(list.getCompoundTagAt(i));

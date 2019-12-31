@@ -3,6 +3,7 @@ package com.gm910.magicmod.blocks;
 import java.util.Random;
 import java.util.UUID;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.deity.util.ServerPos;
@@ -269,7 +270,7 @@ public class BlockStatue extends BlockBase {
 		}
 		
 		public TileEntityStatue() {
-			this.deity = Deities.deities.get((new Random()).nextInt(Deities.deities.size()));
+			this.deity = MagicMod.deities().deities.get((new Random()).nextInt(MagicMod.deities().deities.size()));
 		}
 		
 		public Deity getDeity() {
@@ -281,7 +282,7 @@ public class BlockStatue extends BlockBase {
 		
 		@Override
 		public void update() {
-			this.deity = world.getBlockState(pos).getBlock() instanceof BlockStatue ? ((BlockStatue)world.getBlockState(pos).getBlock()).deity : Deities.LEVIATHAN;
+			this.deity = world.getBlockState(pos).getBlock() instanceof BlockStatue ? ((BlockStatue)world.getBlockState(pos).getBlock()).deity : MagicMod.deities().LEVIATHAN;
 			if (world == null) {
 				System.out.println("blockstatue noworld");
 				return;
@@ -298,7 +299,7 @@ public class BlockStatue extends BlockBase {
 			// TODO Auto-generated method stub
 			super.readFromNBT(compound);
 			this.placer = compound.getUniqueId("Placer");
-			this.deity = Deities.fromString(compound.getString("Deity"));
+			this.deity = MagicMod.deities().fromString(compound.getString("Deity"));
 		}
 		
 		@Override

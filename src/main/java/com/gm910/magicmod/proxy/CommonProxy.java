@@ -1,38 +1,41 @@
 package com.gm910.magicmod.proxy;
 
-import java.nio.charset.Charset;
-
 import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
-import com.gm910.magicmod.proxy.CommonProxy.MagicMessage.MagicMessageHandler;
+import com.gm910.magicmod.handling.MagicHandler;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonProxy {
 	
 	public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MagicMod.MODID);
 	
+	public final Deities deities;
+	public final MagicHandler magic;
+	
 	public CommonProxy() {
-		NETWORK.registerMessage(MagicMessageHandler.class, MagicMessage.class, 0, Side.SERVER);
+		//NETWORK.registerMessage(MagicMessageHandler.class, DeityMessage.class, 0, Side.CLIENT);
 		//NETWORK.registerMessage(MagicMessageHandler.class, MagicMessage.class, 1, Side.CLIENT);
+
+		deities = new Deities();
+		
+		magic = new MagicHandler();
 	}
 	
 	public void registerItemRenderer(Item item, int meta, String id) {
 		
+	}
+	
+	public Deities getDeities() {
+		return deities;
+	}
+	
+	public MagicHandler getMagic() {
+		 return magic;
 	}
 	
 	public void registerVariantRenderer(Item item, int meta, String filename, String id) {}
@@ -41,12 +44,12 @@ public class CommonProxy {
 		return FMLCommonHandler.instance().getMinecraftServerInstance();
 	}
 	
-	public static class MagicMessage implements IMessage {
+	/*public static class DeityMessage implements IMessage {
 		  // A default constructor is always required
-		  public MagicMessage(){}
+		  public DeityMessage(){}
 
 		  private NBTTagCompound toSend = null;
-		  public MagicMessage(NBTTagCompound compound) {
+		  public DeityMessage(NBTTagCompound compound) {
 		    this.toSend = compound;
 		  }
 
@@ -68,20 +71,22 @@ public class CommonProxy {
 				e.printStackTrace();
 			}
 		  }
-		  public static class MagicMessageHandler implements IMessageHandler<MagicMessage, IMessage> {
+
+		  public static class MagicMessageHandler implements IMessageHandler<DeityMessage, IMessage> {
 			  // Do note that the default constructor is required, but implicitly defined in this case
 			  
 			  
-			  @Override public IMessage onMessage(MagicMessage message, MessageContext ctx) {
+			  @Override public IMessage onMessage(DeityMessage message, MessageContext ctx) {
 			    // This is the player the packet was sent to the server from
-			    EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
+				
+			    //EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
 			    
 			    // The value that was sent
 			    NBTTagCompound comp = message.toSend;
-			    
+			    MagicMod.proxy.deities.readFromNBT(comp);
 			    // Execute the action on the main server thread by adding it as a scheduled task
 			    serverPlayer.getServerWorld().addScheduledTask(() -> {
-			    	Deities.readFromNBT(comp);
+			    	MagicMod.proxy.deities.readFromNBT(comp);
 			      //serverPlayer.sendMessage(new TextComponentString(comp.toString()));
 			    });
 			    // No response packet
@@ -89,6 +94,6 @@ public class CommonProxy {
 			  }
 		}
 		  
-	}
+	}*/
 	
 }

@@ -1,5 +1,6 @@
 package com.gm910.magicmod.deity.capability;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,14 +12,14 @@ public class DeityDataLoader implements IDeityData {
 	@Override
 	public NBTTagCompound getData() {
 		
-		NBTTagCompound comp = Deities.writeToNBT(new NBTTagCompound());
+		NBTTagCompound comp = MagicMod.deities().writeToNBT(new NBTTagCompound());
 		System.out.println("Saved deity data");
 		return comp;
 	}
 
 	@Override
 	public void setData(NBTTagCompound comp) {
-		Deities.readFromNBT(comp);
+		MagicMod.deities().readFromNBT(comp);
 		System.out.println("Loaded deity data");
 		
 	}

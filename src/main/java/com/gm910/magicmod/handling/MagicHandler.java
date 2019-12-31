@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 
 import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.blocks.te.TileEntityPentacle;
-import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.deity.util.ServerPos;
 import com.gm910.magicmod.entity.classes.demons.EntityDemon;
@@ -35,17 +34,19 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 
 public class MagicHandler {
 
+	public final List<Spell> spells = new ArrayList<Spell>();
 	
 	public abstract static class Spell {
-		public static final List<Spell> spells = new ArrayList<Spell>();
 		protected String incantation;
 		protected ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 		protected Predicate<? super ItemStack> pred = null;
@@ -56,7 +57,7 @@ public class MagicHandler {
 		
 		public static void registerSpell(Spell spell) {
 			System.out.println(spell + " registered");
-			spells.add(spell);
+			MagicMod.proxy.magic.spells.add(spell);
 			
 		}
 		
@@ -218,7 +219,7 @@ public class MagicHandler {
 			});
 			System.out.println(stacks.keySet());
 			
-			for (Spell m : spells) {
+			for (Spell m : MagicMod.magic().spells) {
 				//System.out.println(m);
 				String incanta = TextFormatting.getTextWithoutFormattingCodes(m.incantation.trim());
 				incantation = TextFormatting.getTextWithoutFormattingCodes(incantation.trim());
@@ -440,7 +441,7 @@ public class MagicHandler {
 		
 	}
 	
-	public static void initSpells() {
+	public void initSpells() {
 		Spell.registerSpell(SUMMON_FURNACE);
 		Spell.registerSpell(SUMMON_IMP);
 		Spell.registerSpell(SUMMON_CACODEMON);
@@ -450,19 +451,19 @@ public class MagicHandler {
 		Spell.registerSpell(DISMISS_DEMON);
 		Spell.registerSpell(DESTROY_PENTACLE);
 		Spell.registerSpell(BLOOD_ORB);
-		for (Deity deity : Deities.deities) {
+		for (Deity deity : MagicMod.proxy.deities.deities) {
 			Spell.registerSpell(new PentacleInvokeDeity(deity));
 		}
 	}
 
-	public static final Spell SUMMON_FURNACE = new PentacleSummon("fornacis", "forge_demon", new ItemStack(Items.MAGMA_CREAM, 1));
-	public static final Spell SUMMON_IMP = new PentacleSummon("belli", "imp", new ItemStack(Items.GOLDEN_SWORD, 1));
-	public static final Spell SUMMON_CACODEMON = new PentacleSummon("asyli", "cacodemon", new ItemStack(Items.SHIELD, 1));
-	public static final Spell SUMMON_GOETURGE = new PentacleSummon("goetiae", "goeturge", new ItemStack(Item.getItemFromBlock(Blocks.ENCHANTING_TABLE), 1));
-	public static final Spell SUMMON_AZRAELITE = new PentacleSummon("mortis", "azraelite", new ItemStack(Items.NETHER_STAR, 1));
-	public static final Spell SUMMON_GATEKEEPER = new PentacleSummon("ianuae", "gatekeeper", it -> it.hasTagCompound(), new ItemStack(ItemInit.DEMON_ORB, 1));
+	public final Spell SUMMON_FURNACE = new PentacleSummon("fornacis", "forge_demon", new ItemStack(Items.MAGMA_CREAM, 1));
+	public final Spell SUMMON_IMP = new PentacleSummon("belli", "imp", new ItemStack(Items.GOLDEN_SWORD, 1));
+	public final Spell SUMMON_CACODEMON = new PentacleSummon("asyli", "cacodemon", new ItemStack(Items.SHIELD, 1));
+	public final Spell SUMMON_GOETURGE = new PentacleSummon("goetiae", "goeturge", new ItemStack(Item.getItemFromBlock(Blocks.ENCHANTING_TABLE), 1));
+	public final Spell SUMMON_AZRAELITE = new PentacleSummon("mortis", "azraelite", new ItemStack(Items.NETHER_STAR, 1));
+	public final Spell SUMMON_GATEKEEPER = new PentacleSummon("ianuae", "gatekeeper", it -> it.hasTagCompound(), new ItemStack(ItemInit.DEMON_ORB, 1));
 	
-	public static final Spell DESTROY_PENTACLE = new Spell("daemon destruo") {
+	public final Spell DESTROY_PENTACLE = new Spell("daemon destruo") {
 		@Override
 		public boolean onRunSpell(World world, BlockPos pentacle, EntityLivingBase activator,
 				ArrayList<ItemStack> items) {
@@ -477,7 +478,7 @@ public class MagicHandler {
 		}
 	};
 	
-	public static final Spell BLOOD_ORB = new Spell("daemon ego", it -> it.hasTagCompound(), new ItemStack(ItemInit.BLOOD_ORB, 1)) {
+	public final Spell BLOOD_ORB = new Spell("daemon ego", it -> it.hasTagCompound(), new ItemStack(ItemInit.BLOOD_ORB, 1)) {
 		@Override
 		public boolean onRunSpell(World world, BlockPos pentacle, EntityLivingBase activator,
 				ArrayList<ItemStack> items) {
@@ -503,7 +504,7 @@ public class MagicHandler {
 		}
 	};
 	
-	public static final Spell DISMISS_DEMON = new Spell("daemon amando") {
+	public final Spell DISMISS_DEMON = new Spell("daemon amando") {
 		@Override
 		public boolean onRunSpell(World world, BlockPos pentacle, EntityLivingBase activator,
 				ArrayList<ItemStack> items) {

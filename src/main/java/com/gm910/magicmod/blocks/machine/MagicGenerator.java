@@ -118,7 +118,7 @@ public class MagicGenerator extends BlockBase {
 						}
 						IBlockState state = world.getBlockState(checkPos);
 						
-						if (world.getTileEntity(checkPos) instanceof IMagicEnergy && world.getTileEntity(checkPos) != this && world.rand.nextInt(30) < 2) {
+						if (world.isRemote && world.getTileEntity(checkPos) instanceof IMagicEnergy && world.getTileEntity(checkPos) != this && world.rand.nextInt(30) < 2) {
 							((IMagicEnergy)world.getTileEntity(checkPos)).receiveEnergy((int)(storage.getEnergyStored() / 10.0));
 							this.extractEnergy((int)(storage.getEnergyStored() / 10.0));
 							for (int i = 0; i < 20; i++) world.spawnParticle(EnumParticleTypes.REDSTONE, 

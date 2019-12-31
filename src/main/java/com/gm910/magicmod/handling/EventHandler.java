@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.blocks.te.TileEntityPentacle;
 import com.gm910.magicmod.capabilities.ghosts.GhostProvider;
 import com.gm910.magicmod.capabilities.ghosts.IGhost;
@@ -71,6 +72,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @EventBusSubscriber
 public class EventHandler {
@@ -143,7 +146,7 @@ public class EventHandler {
 						}
 						System.out.println("Found Pentacle: " + event.getMessage().toLowerCase());
 						((TileEntityPentacle)world.getTileEntity(pos)).setIncantation(event.getMessage().toLowerCase());
-						for (Spell spell : MagicHandler.Spell.spells) {
+						for (Spell spell : MagicMod.magic().spells) {
 							if (spell.incantation.equalsIgnoreCase(event.getMessage())) {
 								
 								event.setComponent(new TextComponentString(spell.getFormatted()));
@@ -220,9 +223,9 @@ public class EventHandler {
 		}
 	}
 
+	@SideOnly(Side.SERVER)
 	@SubscribeEvent
 	public static void update(LivingUpdateEvent event) {
-		if (event.getEntity().world.isRemote) return;
 		if (event.getEntity() instanceof EntityPlayer || event.getEntity() instanceof EntityDemon) return;
 		if (event.getEntity() instanceof EntityVillager) {
 			List<Village> villages = event.getEntity().world.getVillageCollection().getVillageList();
@@ -268,9 +271,9 @@ public class EventHandler {
 				{
 					
 					//System.out.println("Priestless village");
-					Deity d = Deities.deities.get(event.getEntityLiving().getRNG().nextInt(Deities.deities.size()));
+					Deity d = MagicMod.deities().deities.get(event.getEntityLiving().getRNG().nextInt(MagicMod.deities().deities.size()));
 					while (!d.canVillageFollow) {
-						d = Deities.deities.get(event.getEntityLiving().getRNG().nextInt(Deities.deities.size()));
+						d = MagicMod.deities().deities.get(event.getEntityLiving().getRNG().nextInt(MagicMod.deities().deities.size()));
 					}
 					List<EntityLivingBase> villagers = event.getEntity().world.<EntityLivingBase>getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB((double)(village.getCenter().getX() - village.getVillageRadius()), (double)(village.getCenter().getY() - 4), (double)(village.getCenter().getZ() - village.getVillageRadius()), (double)(village.getCenter().getX() + village.getVillageRadius()), (double)(village.getCenter().getY() + 4), (double)(village.getCenter().getZ() + village.getVillageRadius())));
 					if (!villagers.isEmpty()) {
@@ -286,7 +289,7 @@ public class EventHandler {
 									hasPriest = true;
 									boolean shouldReligion = true;
 									religion.setPriest(villager);
-									for (Deity deit : Deities.deities) {
+									for (Deity deit : MagicMod.deities().deities) {
 										if (deit.isDevout(villager)) {
 											shouldReligion = false;
 											if (religion.getReligion() == null) {
@@ -384,16 +387,17 @@ public class EventHandler {
 		//System.out.println(event.getEntityLiving().getEntityData() != null ? event.getEntityLiving().getEntityData().getUniqueId("Azraelite") : "hh");
 	}
 
+	@SideOnly(Side.SERVER)
 	@SubscribeEvent
 	public static void load(WorldEvent.Load event) {
 		if (event.getWorld().isRemote) return;
 		World ov = event.getWorld().getMinecraftServer().getWorld(0);
 		IDeityData dat = ov.getCapability(DeityDataProvider.DEITY_CAP, null);
-		for (Deity deity : Deities.deities) {
+		for (Deity deity : MagicMod.deities().deities) {
 			deity.server = event.getWorld().getMinecraftServer();
 		}
 		if (!dat.afterWorldFirstLoad()) {
-			Deities.resetDeities();
+			MagicMod.deities().resetDeities();
 			dat.setWorldFirstLoad(true);
 		}
 	}

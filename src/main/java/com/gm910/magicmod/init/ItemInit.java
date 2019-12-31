@@ -38,7 +38,7 @@ public class ItemInit {
 	public static final Map<Deity, Item> ITEM_HOLY_BOOKS = new HashMap<Deity, Item>();
 	
 	public static void createHolyBooks() {
-		for (Deity d : Deities.deities) {
+		for (Deity d : MagicMod.proxy.getDeities().deities) {
 			ITEM_HOLY_BOOKS.put(d, new ItemHolyBook(d));
 		}
 	}

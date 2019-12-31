@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.gm910.magicmod.MagicMod;
-import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.init.PotionInit;
 import com.google.common.collect.Lists;
@@ -20,6 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandDeity extends CommandBase {
@@ -82,7 +82,7 @@ public class CommandDeity extends CommandBase {
 			
 			String dString = args[1];
 			String operation = args[2];
-			Deity deity = Deities.fromString(ResourceLocation.splitObjectName(dString)[0].equalsIgnoreCase("minecraft") ? (new ResourceLocation("magicmod:" + dString)).toString() : dString);
+			Deity deity = MagicMod.deities().fromString(ResourceLocation.splitObjectName(dString)[0].equalsIgnoreCase("minecraft") ? (new ResourceLocation("magicmod:" + dString)).toString() : dString);
 			List<Entity> players = new ArrayList<Entity>();
 			
 			if (args.length == 5) {
@@ -100,13 +100,13 @@ public class CommandDeity extends CommandBase {
 			
 			if (deity == null) {
 				if (!dString.equalsIgnoreCase("all")) {
-					sender.sendMessage(new TextComponentString(TextFormatting.RED + dString + " is not a deity!"));
+					sender.sendMessage(new TextComponentTranslation("deity.command.notdeity", TextFormatting.RED, dString));
 					return;
 				}
 			}
 			
 			if (players.isEmpty()) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Selector " + args[4] + " found nothing"));
+				sender.sendMessage(new TextComponentTranslation("deity.command.foundnothing", TextFormatting.RED, args[4]));
 				return;
 			}
 			
@@ -119,7 +119,7 @@ public class CommandDeity extends CommandBase {
 			}
 			if (args[0].equalsIgnoreCase("worship")) {
 				if (dString.equalsIgnoreCase("all")) {
-					for (Deity d : Deities.deities) {
+					for (Deity d : MagicMod.deities().deities) {
 						for (Entity en : players) {
 							if (d.isDevout(en.getUniqueID())) {
 								if (operation.equalsIgnoreCase("add")) {
@@ -129,7 +129,7 @@ public class CommandDeity extends CommandBase {
 								} else if (operation.equalsIgnoreCase("set")) {
 									d.setWorship((EntityLivingBase)en, points);
 								}
-								en.sendMessage(new TextComponentString("You now have " + d.getWorship((EntityLivingBase)en) + " worship for " + d));
+								en.sendMessage(new TextComponentTranslation("deity.command.notifyworship", d.getWorship((EntityLivingBase)en), d));
 							}
 						}
 					}
@@ -143,16 +143,16 @@ public class CommandDeity extends CommandBase {
 							} else if (operation.equalsIgnoreCase("set")) {
 								deity.setWorship((EntityLivingBase)en, points);
 							}
-							en.sendMessage(new TextComponentString("You now have " + deity.getWorship((EntityLivingBase)en) + " worship for " + deity));
+							en.sendMessage(new TextComponentTranslation("deity.command.notifyworship", deity.getWorship((EntityLivingBase)en), deity));
 						}
 					}
 				}
 			} else {
 				points = (int)points;
 				if (dString.equalsIgnoreCase("all")) {
-					for (Deity d : Deities.deities) {
+					for (Deity d : MagicMod.deities().deities) {
 						for (Entity en : players) {
-							if (d.isDevout(en.getUniqueID())) {
+							//if (d.isDevout(en.getUniqueID())) {
 								if (operation.equalsIgnoreCase("add")) {
 									d.changePointsBy((EntityLivingBase)en, (int)points);
 								} else if (operation.equalsIgnoreCase("subtract")) {
@@ -160,14 +160,14 @@ public class CommandDeity extends CommandBase {
 								} else if (operation.equalsIgnoreCase("set")) {
 									d.setPoints((EntityLivingBase)en, (int)points);
 								}
-								en.sendMessage(new TextComponentString("You now have " + d.getPoints((EntityLivingBase)en) + " levels for " + d));
-							}
+								en.sendMessage(new TextComponentTranslation("deity.command.notifylevels", d.getPoints((EntityLivingBase)en), d));
+							//}
 						}
 					}
 				} else {
 					for (Entity en : players) {
 						System.out.println(operation);
-						if (deity.isDevout(en.getUniqueID())) {
+						//if (deity.isDevout(en.getUniqueID())) {
 							if (operation.equalsIgnoreCase("add")) {
 								deity.changePointsBy((EntityLivingBase)en, (int)points);
 								deity.notifyDevotion((EntityLivingBase)en);
@@ -178,8 +178,8 @@ public class CommandDeity extends CommandBase {
 								deity.setPoints((EntityLivingBase)en, (int)points);
 								deity.notifyDevotion((EntityLivingBase)en);
 							}
-							en.sendMessage(new TextComponentString("You now have " + deity.getPoints((EntityLivingBase)en) + " points for " + deity));
-						}
+							en.sendMessage(new TextComponentTranslation("deity.command.notifylevels", deity.getPoints((EntityLivingBase)en), deity));
+						//}
 					}
 				}
 			}
@@ -190,10 +190,10 @@ public class CommandDeity extends CommandBase {
 				return;
 			} 
 			String dString = args[1];
-			Deity deity = Deities.fromString(ResourceLocation.splitObjectName(dString)[0].equalsIgnoreCase("minecraft") ? (new ResourceLocation("magicmod:" + dString)).toString() : dString);
+			Deity deity = MagicMod.deities().fromString(ResourceLocation.splitObjectName(dString)[0].equalsIgnoreCase("minecraft") ? (new ResourceLocation("magicmod:" + dString)).toString() : dString);
 			
 			if (deity == null) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + " is not a deity!"));
+				sender.sendMessage(new TextComponentTranslation("deity.command.notdeity", TextFormatting.RED, dString));
 				return;
 			}
 			int time = 2400;
@@ -201,7 +201,7 @@ public class CommandDeity extends CommandBase {
 			List<Entity> players = getEntityList(server, sender, selector);
 			players.removeIf(en -> !(en instanceof EntityLivingBase));
 			if (players.isEmpty()) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Selector " + args[4] + " found nothing"));
+				sender.sendMessage(new TextComponentTranslation("deity.command.foundnothing", TextFormatting.RED, args[4]));
 				return;
 			}
 			
@@ -234,17 +234,17 @@ public class CommandDeity extends CommandBase {
 				return getListOfStringsMatchingLastWord(args, commands.toArray(new String[4]));
 			case 2: 
 				if (args[0].equalsIgnoreCase("curse") || args[0].equalsIgnoreCase("bless")) {
-					String[] list = new String[Deities.deities.size()];
-					for (int i = 0; i < Deities.deities.size(); i++) {
-						list[i] = Deities.deities.get(i).getUnlocName().toString();
+					String[] list = new String[MagicMod.deities().deities.size()];
+					for (int i = 0; i < MagicMod.deities().deities.size(); i++) {
+						list[i] = MagicMod.deities().deities.get(i).getUnlocName().toString();
 					}
 					
 					if (list.length == 0) return Collections.emptyList();
 					return getListOfStringsMatchingLastWord(args, list);
 				} else if (args[0].equalsIgnoreCase("worship") || args[0].equalsIgnoreCase("level")){
-					String[] list = new String[Deities.deities.size() + 1];
-					for (int i = 0; i < Deities.deities.size(); i++) {
-						list[i] = Deities.deities.get(i).getUnlocName().getResourcePath();
+					String[] list = new String[MagicMod.deities().deities.size() + 1];
+					for (int i = 0; i < MagicMod.deities().deities.size(); i++) {
+						list[i] = MagicMod.deities().deities.get(i).getUnlocName().getResourcePath();
 					}
 					list[list.length-1] = "all";
 					if (list.length == 0) return Collections.emptyList();

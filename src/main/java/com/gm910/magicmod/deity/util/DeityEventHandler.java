@@ -1,5 +1,6 @@
 package com.gm910.magicmod.deity.util;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.gm910.magicmod.MagicMod;
@@ -7,14 +8,14 @@ import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity.Quest;
 import com.gm910.magicmod.deity.util.Deity.Status;
 import com.gm910.magicmod.init.PotionInit;
-import com.gm910.magicmod.proxy.CommonProxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -32,6 +33,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,6 +42,8 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @EventBusSubscriber
 public class DeityEventHandler {
@@ -49,8 +53,8 @@ public class DeityEventHandler {
 	@SubscribeEvent
 	public static void func(LivingUpdateEvent event) {
 		
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.deities.deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.deities.deities) {
 				/*if (d.getTimeActive() > 0) {
 					d.setTimeActive(d.getTimeActive() - 1);
 				} else {
@@ -106,11 +110,17 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(ServerTickEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.deities.deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.deities.deities) {
 				d.onGeneralTick(event);
 				for (Quest q : d.getQuests().values()) {
 					q.onEvent(event);
+				}
+				if (time <= 0) {
+					//CommonProxy.NETWORK.sendToAll(new CommonProxy.DeityMessage(MagicMod.deities().writeToNBT(new NBTTagCompound())));
+					time = 1000;
+				} else {
+					time--;
 				}
 			}
 		}
@@ -118,18 +128,19 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void client(ClientTickEvent event) {
-		if (time <= 0) {
-			CommonProxy.NETWORK.sendToServer(new CommonProxy.MagicMessage(Deities.writeToNBT(new NBTTagCompound())));
-			/*for (EntityPlayer player : CommonProxy.getServer().getPlayerList().getPlayers()) {
-				System.out.println(player + ": " + Deities.LEVIATHAN.isDevout(player));
-			}*/
+		//System.out.println("sdfghj");
+		/*if (time <= 0) {
+			CommonProxy.NETWORK.sendToServer(new CommonProxy.DeityMessage(MagicMod.deities().writeToNBT(new NBTTagCompound())));
+			for (EntityPlayer player : CommonProxy.getServer().getPlayerList().getPlayers()) {
+				System.out.println(player + ": " + MagicMod.deities().LEVIATHAN.isDevout(player));
+			}
 			time = 1000;
 		} else {
 			time--;
-		}
+		}*/
 		for (KeyBinding key : MagicMod.keybindings.values()) {
-			if (!Deities.deities.isEmpty()) {
-				for (Deity d : Deities.deities) {
+			if (!MagicMod.proxy.deities.deities.isEmpty()) {
+				for (Deity d : MagicMod.proxy.deities.deities) {
 					if (key.isPressed() && d.canAccessInventory(Minecraft.getMinecraft().player.getUniqueID())) {
 						d.onKeyPressed(key, Minecraft.getMinecraft().player);
 					}
@@ -138,12 +149,38 @@ public class DeityEventHandler {
 				}
 			}
 		}
+		
+		World world = FMLClientHandler.instance().getWorldClient();
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		if (world != null && player != null) {
+			for (Deity deity : MagicMod.deities().deities) {
+				if (deity.isDevout(Minecraft.getMinecraft().player)) {
+					List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, Minecraft.getMinecraft().player.getEntityBoundingBox().grow(10), en -> {
+						
+					return deity.isDevout(en) && en != Minecraft.getMinecraft().player;
+					});
+					if (entities.isEmpty()) continue;
+					for (EntityLivingBase en : entities) {
+						for (int i = 0; i < 3; i++) {
+							double x = world.rand.nextDouble()*2-1;
+							double y = world.rand.nextDouble()*2-1;
+							double z = world.rand.nextDouble() * 2 -1;
+							double xs = world.rand.nextDouble()*2-1;
+							double ys = world.rand.nextDouble()*2-1;
+							double zs = world.rand.nextDouble()*2-1;
+							world.spawnParticle(EnumParticleTypes.CRIT, en.posX+x, en.posY+y, en.posZ+z, xs, ys, zs);
+						}
+					}
+				}
+			}
+		}
+		
 	}
 	
 	@SubscribeEvent
 	public static void func(NameFormat event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.deities.deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.deities.deities) {
 				if (d.getStatus() == Status.SUPPLANTED) {
 					if (d.getSupplanter().equals(event.getEntityPlayer().getUniqueID())) {
 						event.setDisplayname(event.getUsername() + ", " + d.getTitle());
@@ -158,8 +195,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(LivingDeathEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDeathOfDevout(event);
 					d.__on__death__devout(event);
@@ -187,8 +224,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerInteractEvent.RightClickBlock event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutInteract(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -206,8 +243,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerInteractEvent.RightClickEmpty event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutRightClick(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -225,8 +262,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerInteractEvent.RightClickItem event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.questItems.containsValue(event.getItemStack().getItem())) {
 					if (d.isDevout(event.getEntityLiving())) {
 						d.onDevoutUseQuestItem(event, event.getItemStack().getItem());
@@ -256,8 +293,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerInteractEvent.EntityInteract event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					if (event.getTarget().equals(d.getAvatar())) {
 						d.onDevoutInteractDeity(event);
@@ -301,8 +338,8 @@ public class DeityEventHandler {
 	public static void func(BlockEvent.EntityPlaceEvent event) {
 		if (!(event.getEntity() instanceof EntityLivingBase)) return;
 		EntityLivingBase entity = (EntityLivingBase)event.getEntity();
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(entity)) {
 					d.onDevoutPlaceBlock(event);
 				} else if (d.isEnemy(entity)) {
@@ -321,8 +358,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void quests(Event event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				d.onAnyEvent(event);
 				for (Quest q : d.getQuests().values()) {
 					q.onEvent(event);
@@ -338,8 +375,8 @@ public class DeityEventHandler {
 	@SubscribeEvent
 	public static void blessland(LivingEvent event) {
 		
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				EntityLivingBase entity = event.getEntityLiving();
 				if (event.getEntityLiving() == null) return;
 				if (d.isDevout(entity)) {
@@ -399,8 +436,8 @@ public class DeityEventHandler {
 	@SubscribeEvent
 	public static void func(BlockEvent.BreakEvent event) {
 		EntityLivingBase entity = event.getPlayer();
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(entity)) {
 					d.onDevoutBreakBlock(event);
 				} else if (d.isEnemy(entity)) {
@@ -418,8 +455,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerDestroyItemEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutDestroyItem(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -437,8 +474,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(LivingDropsEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutDrop(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -456,8 +493,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(LivingAttackEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutAttacked(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -482,8 +519,9 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerContainerEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		Deities deit = MagicMod.proxy.getDeities();
+		if (!deit.deities.isEmpty()) {
+			for (Deity d : deit.deities) {
 				if (d.isDevout(event.getEntityLiving())) {
 					d.onDevoutContainer(event);
 				} else if (d.isEnemy(event.getEntityLiving())) {
@@ -501,9 +539,10 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(PlayerWakeUpEvent event) {
+		Deities deities = MagicMod.proxy.getDeities();
 		int time = (int) event.getEntityPlayer().getEntityWorld().getWorldTime();
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!deities.deities.isEmpty()) {
+			for (Deity d : deities.deities) {
 				if (d.ticksTillSunrise.getValue() > 0) {
 
 					int sleepTime = d.ticksTillSunrise.getValue();
@@ -536,12 +575,13 @@ public class DeityEventHandler {
 		}
 	}
 	
+	@SideOnly(Side.SERVER)
 	@SubscribeEvent
 	public static void func(PlayerSleepInBedEvent event) {
 		if (event.getEntity().world.isRemote) return;
 		WorldServer world = (WorldServer) event.getEntityPlayer().world;
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (world.areAllPlayersAsleep()) {
 					d.ticksTillSunrise.setValue((int) world.getWorldTime());
 					
@@ -550,10 +590,11 @@ public class DeityEventHandler {
 		}
 	}
 	
+	@SideOnly(Side.SERVER)
 	@SubscribeEvent
 	public static void func(ItemTossEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.deities().deities.isEmpty()) {
+			for (Deity d : MagicMod.deities().deities) {
 				if (d.isDevout(event.getPlayer())) {
 					d.onDevoutToss(event);
 				} else if (d.isEnemy(event.getPlayer())) {
@@ -569,10 +610,12 @@ public class DeityEventHandler {
 		}
 	}
 	
+	
 	@SubscribeEvent
 	public static void func(ServerChatEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		
+		if (!MagicMod.proxy.getDeities().deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.getDeities().deities) {
 				if (d.isDevout(event.getPlayer())) {
 					d.onDevoutChat(event);
 				} else if (d.isEnemy(event.getPlayer())) {
@@ -590,8 +633,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(ItemCraftedEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.getDeities().deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.getDeities().deities) {
 				if (d.isDevout(event.player)) {
 					d.onDevoutCraft(event);
 				} else if (d.isEnemy(event.player)) {
@@ -609,8 +652,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void func(ItemPickupEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.getDeities().deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.getDeities().deities) {
 				if (d.isDevout(event.player)) {
 					d.onDevoutPickup(event);
 				} else if (d.isEnemy(event.player)) {
@@ -628,8 +671,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void constructing(EntityConstructing event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.getDeities().deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.getDeities().deities) {
 				if (d.getNaturallyDevout().contains(event.getEntity().getClass())) {
 					d.changePointsBy((EntityLivingBase)event.getEntity(), 1);
 					break;
@@ -640,8 +683,8 @@ public class DeityEventHandler {
 	
 	@SubscribeEvent
 	public static void spawn(PlayerRespawnEvent event) {
-		if (!Deities.deities.isEmpty()) {
-			for (Deity d : Deities.deities) {
+		if (!MagicMod.proxy.getDeities().deities.isEmpty()) {
+			for (Deity d : MagicMod.proxy.getDeities().deities) {
 				if (d.deadPlayerFavor.containsKey(event.player.getUniqueID())) {
 					d.resurrectPlayer(event.player.getPersistentID());
 				}
@@ -653,8 +696,8 @@ public class DeityEventHandler {
 	public static void join(EntityJoinWorldEvent event) {
 		if (event.getEntity() instanceof EntityPlayer) {
 			if (event.getEntity().isEntityAlive()) {
-				if (!Deities.deities.isEmpty()) {
-					for (Deity d : Deities.deities) {
+				if (!MagicMod.deities().deities.isEmpty()) {
+					for (Deity d : MagicMod.deities().deities) {
 						if (d.deadPlayerFavor.containsKey(event.getEntity().getUniqueID())) {
 							d.resurrectPlayer(event.getEntity().getPersistentID());
 						}

@@ -3,6 +3,7 @@ package com.gm910.magicmod.init;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.effects.DeityPotion;
@@ -29,7 +30,7 @@ public class PotionInit {
 	
 	
 	public static void initDeityEffectsAndBottles() {
-		for (Deity d : Deities.deities) {
+		for (Deity d : MagicMod.deities().deities) {
 			DeityPotion blessing = new DeityPotion(d, false);
 			DeityPotion curse = new DeityPotion(d, true);
 			BLESSINGS.put(d, blessing);
@@ -44,7 +45,7 @@ public class PotionInit {
 	}
 	
 	public static void registerPotions() {
-		for (Deity d : Deities.deities) {
+		for (Deity d : MagicMod.deities().deities) {
 			registerPotion(BLESSING_BOTTLES.get(d), LONG_BLESSING_BOTTLES.get(d), BLESSINGS.get(d));
 			registerPotion(CURSE_BOTTLES.get(d), LONG_CURSE_BOTTLES.get(d), CURSES.get(d));
 		}

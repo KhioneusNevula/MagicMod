@@ -1,5 +1,6 @@
 package com.gm910.magicmod.items;
 
+
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.init.PotionInit;
 
@@ -9,8 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.world.World;
 
 public class ItemHolyBook extends ItemBase {
@@ -25,8 +27,13 @@ public class ItemHolyBook extends ItemBase {
 	@Override
 	public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target,
 			EnumHand hand) {
-			if (target instanceof EntityPlayer && deity.isDevout(playerIn)) {
-				//((EntityPlayer)target).sendStatusMessage(new TextComponentString("Join " + deity.getDisplayName() + "?"), true);
+			if (!deity.isDevout(target) && deity.isDevout(playerIn)) {
+				if (target instanceof EntityPlayer) {
+					TextComponentTranslation tc = new TextComponentTranslation("deity.join", deity.getDisplayName().getFormattedText());
+					tc.setStyle(tc.getStyle().setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/deity level " + deity.getUnlocName().toString() + " add 1 @p")));
+				} else {
+					deity.changePointsBy(target, 1);
+				}
 			}
 		return super.itemInteractionForEntity(stack, playerIn, target, hand);
 	}

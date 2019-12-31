@@ -3,6 +3,7 @@ package com.gm910.magicmod.deity.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.deity.util.ServerPos;
@@ -49,7 +50,7 @@ public class EntityDeity extends EntityMob implements IMerchant, IDemonBoundPos 
 		setSize(1, 2);
 		setNoGravity(true);
 		//noClip = true;
-		this.deity = Deities.LEVIATHAN;
+		this.deity = MagicMod.deities().LEVIATHAN;
 		graceTime = 100;
 		
 	}
@@ -110,7 +111,7 @@ public class EntityDeity extends EntityMob implements IMerchant, IDemonBoundPos 
 	public void deserializeNBT(NBTTagCompound nbt) {
 		boolean condition = false;
 		if (nbt.hasKey("Deity")) {
-			this.deity = Deities.fromString(nbt.getString("Deity"));
+			this.deity = MagicMod.deities().fromString(nbt.getString("Deity"));
 			condition = true;
 		}
 

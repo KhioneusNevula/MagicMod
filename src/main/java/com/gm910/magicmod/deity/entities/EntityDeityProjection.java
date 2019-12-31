@@ -1,5 +1,6 @@
 package com.gm910.magicmod.deity.entities;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.util.Deity;
 import com.gm910.magicmod.deity.util.ServerPos;
@@ -173,7 +174,7 @@ public class EntityDeityProjection extends EntityLiving {
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt) {
 		if (nbt.hasKey("Deity")) {
-			this.deity = Deities.fromString(nbt.getString("Deity"));
+			this.deity = MagicMod.deities().fromString(nbt.getString("Deity"));
 		}
 		
 		if (nbt.hasKey("Summoner")) {

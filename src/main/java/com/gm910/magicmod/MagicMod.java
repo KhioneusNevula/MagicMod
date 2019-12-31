@@ -32,6 +32,7 @@ import net.minecraftforge.common.ForgeChunkManager.OrderedLoadingCallback;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -41,11 +42,14 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerCareer;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(modid=MagicMod.MODID, name=MagicMod.MODNAME, version=MagicMod.VERSION, acceptedMinecraftVersions=MagicMod.ACCEPTED_MINECRAFT_VERSIONS)
 @EventBusSubscriber(modid = MagicMod.MODID)
@@ -75,17 +79,28 @@ public class MagicMod implements OrderedLoadingCallback {
 	public static MagicMod instance;
 	
 	public MagicMod() {
+
 		
-		Deities.initDeities();
-		PotionInit.initDeityEffectsAndBottles();
-		
+	}
+	
+	public static Deities deities() {
+		return proxy.deities;
+	}
+	
+	public static MagicHandler magic() {
+		return proxy.magic;
 	}
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		System.out.println(MODID + ":preInit");
 		
-		for (Deity d : Deities.deities) {
+
+		deities().initDeities();
+		proxy.getMagic().initSpells();
+		PotionInit.initDeityEffectsAndBottles();
+		
+		for (Deity d : proxy.deities.deities) {
 			Block block = (new BlockStatue(d)).setCreativeTab(CreativeTabs.MISC);
 			BlockInit.GOD_STATUES.put(d, block);
 		}
@@ -94,10 +109,12 @@ public class MagicMod implements OrderedLoadingCallback {
 		
 		CapabilityInit.preInit();
 		EntityInit.registerEntities();
-		RenderHandler.registerEntRenderers();
+		if (event.getSide().isClient()) {
+			RenderHandler.registerEntRenderers();
+		}
 		BiomeInit.registerBiomes();
 		DimensionInit.registerDimensions();
-		MagicHandler.initSpells();
+		
 		PotionInit.registerPotions();
 		
 	}
@@ -117,13 +134,15 @@ public class MagicMod implements OrderedLoadingCallback {
 			System.out.println("No such profession");
 		}
 
+		if (event.getSide().isClient()) {
+			keybindings.put(EnumKey.GOD_INVENTORY, new KeyBinding("key.inventory.desc", Keyboard.KEY_G, "key.divine.category"));
+	    	keybindings.put(EnumKey.GOD_TRADE, new KeyBinding("key.trade.desc", Keyboard.KEY_T, "key.divine.category"));
+	    	
+	    	for (KeyBinding key : keybindings.values()) {
+	    		ClientRegistry.registerKeyBinding(key);
+	    	}
+		}
     	
-    	keybindings.put(EnumKey.GOD_INVENTORY, new KeyBinding("key.inventory.desc", Keyboard.KEY_G, "key.divine.category"));
-    	keybindings.put(EnumKey.GOD_TRADE, new KeyBinding("key.trade.desc", Keyboard.KEY_T, "key.divine.category"));
-    	
-    	for (KeyBinding key : keybindings.values()) {
-    		ClientRegistry.registerKeyBinding(key);
-    	}
 	}
 	
 	@EventHandler
@@ -136,7 +155,7 @@ public class MagicMod implements OrderedLoadingCallback {
 	public void serverInit(FMLServerStartingEvent event) {
 		CommandInit.registerCommands(event);
 	}
-
+	
 	@Override
 	public void ticketsLoaded(List<Ticket> tickets, World world) {
 		int max = ForgeChunkManager.getMaxTicketLengthFor(this.MODID);

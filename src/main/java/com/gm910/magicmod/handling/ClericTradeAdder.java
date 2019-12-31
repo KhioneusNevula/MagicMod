@@ -2,6 +2,7 @@ package com.gm910.magicmod.handling;
 
 import java.util.Random;
 
+import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.capabilities.villagereligion.IVillageReligion;
 import com.gm910.magicmod.capabilities.villagereligion.VReligionProvider;
 import com.gm910.magicmod.deity.Deities;
@@ -23,7 +24,7 @@ public class ClericTradeAdder implements ITradeList {
 	public void addMerchantRecipe(IMerchant merchant, MerchantRecipeList recipeList, Random random) {
 		if (merchant instanceof EntityVillager) {
 			EntityVillager villager = (EntityVillager) merchant;
-			Deity deity = Deities.SEAR;
+			Deity deity = MagicMod.deities().SEAR;
 			if (villager.world.getVillageCollection() != null) {
 				if (villager.world.getVillageCollection().getNearestVillage(villager.getPosition(), 1000) != null) {
 					Village village = villager.world.getVillageCollection().getNearestVillage(villager.getPosition(), 1000);

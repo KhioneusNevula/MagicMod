@@ -26,10 +26,13 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @EventBusSubscriber
 public class RenderHandler {
 	
+	@SideOnly(Side.CLIENT)
 	public static void registerEntRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(EntityForgeDemon.class, new IRenderFactory<EntityForgeDemon>() {
 			
