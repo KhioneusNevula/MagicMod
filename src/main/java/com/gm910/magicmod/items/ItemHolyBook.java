@@ -31,6 +31,7 @@ public class ItemHolyBook extends ItemBase {
 				if (target instanceof EntityPlayer) {
 					TextComponentTranslation tc = new TextComponentTranslation("deity.join", deity.getDisplayName().getFormattedText());
 					tc.setStyle(tc.getStyle().setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/deity level " + deity.getUnlocName().toString() + " add 1 @p")));
+					target.sendMessage(tc);
 				} else {
 					deity.changePointsBy(target, 1);
 				}
@@ -46,7 +47,8 @@ public class ItemHolyBook extends ItemBase {
 				deity.setPoints(playerIn, 1);
 				playerIn.sendStatusMessage(new TextComponentTranslation("item.holy_book.devoted", deity.getDisplayName()), true);
 				
-			} else if (deity.getPoints(playerIn) < 0) {
+			} else 
+			if (deity.getPoints(playerIn) < 0) {
 				playerIn.sendMessage(new TextComponentTranslation("item.holy_book.enemy", deity.getNameToDisplay()));
 				playerIn.addPotionEffect(PotionInit.CURSE_BOTTLES.get(deity).getEffects().get(0));
 			}

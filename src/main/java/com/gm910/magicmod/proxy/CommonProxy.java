@@ -6,6 +6,7 @@ import com.gm910.magicmod.handling.MagicHandler;
 
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -42,6 +43,10 @@ public class CommonProxy {
 	
 	public static MinecraftServer getServer() {
 		return FMLCommonHandler.instance().getMinecraftServerInstance();
+	}
+	
+	public static WorldServer getWorld(int d) {
+		return getServer().getWorld(d);
 	}
 	
 	/*public static class DeityMessage implements IMessage {

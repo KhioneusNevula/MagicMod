@@ -26,13 +26,13 @@ import com.gm910.magicmod.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.OrderedLoadingCallback;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -42,14 +42,11 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerCareer;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(modid=MagicMod.MODID, name=MagicMod.MODNAME, version=MagicMod.VERSION, acceptedMinecraftVersions=MagicMod.ACCEPTED_MINECRAFT_VERSIONS)
 @EventBusSubscriber(modid = MagicMod.MODID)
@@ -154,6 +151,12 @@ public class MagicMod implements OrderedLoadingCallback {
 	@EventHandler
 	public void serverInit(FMLServerStartingEvent event) {
 		CommandInit.registerCommands(event);
+		Scoreboard scoreboard = event.getServer().getWorld(0).getScoreboard();
+		for (Deity deity : deities().deities) {
+			if (scoreboard.getTeam(deity.getUnlocName().getResourcePath()) == null) {
+				scoreboard.createTeam(deity.getUnlocName().getResourcePath());
+			}
+		}
 	}
 	
 	@Override

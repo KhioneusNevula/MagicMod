@@ -8,6 +8,7 @@ import com.gm910.magicmod.MagicMod;
 import com.gm910.magicmod.MagicMod.EnumKey;
 import com.gm910.magicmod.deity.entities.EntityDeity;
 import com.gm910.magicmod.deity.util.Deity;
+import com.gm910.magicmod.deity.util.RandomnessUtils;
 import com.gm910.magicmod.deity.util.ServerPos;
 import com.gm910.magicmod.handling.util.TextUtil;
 import com.gm910.magicmod.magicdamage.DamageSourceMystic;
@@ -18,6 +19,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSeaLantern;
 import net.minecraft.block.BlockSign;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -46,6 +48,7 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -65,12 +68,14 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBloc
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class DeityLeviathan extends Deity {
 	
 	public final ServerPosList rainAltars = new ServerPosList(null);
 	//public final ServerPosList teleporters = new ServerPosList(null);
+	public final UUIDtoServerPosList teleporters = new UUIDtoServerPosList(null);
 	public final Ability rainSummoner = new Ability("RainSummoner", 2);
 	public final Ability waterSpirit = new Ability("WaterSpirit", 3);
 	public final Ability kraken = new Ability("Kraken", 5);
@@ -103,12 +108,14 @@ public class DeityLeviathan extends Deity {
 		this.addRequiredQuestTypes(QuestRain.class, QuestWaterSpirit.class, QuestInventory.class, QuestKraken.class, QuestTeleport.class, QuestShield.class, QuestKill.class, QuestDimension.class);
 		this.addSpecialData("RainAltars", rainAltars);
 		this.addSpecialData("WaterVisionEntities", waterEyes);
+		this.addSpecialData("teleporters", teleporters);
 		this.addQuestItem("rain_horn");
 		this.addQuestItem("kraken_tentacle");
 		this.addQuestItem("ocean_grave");
 		this.addQuestItem("ocean_soul");
 		this.addQuestItem("ocean_mind");
-		this.registerDevoutDataType("teleporters", NBTType.LIST);
+		//this.registerDevoutDataType("teleporters", NBTType.LIST);
+		
 	}
 	
 	@Override
@@ -235,21 +242,42 @@ public class DeityLeviathan extends Deity {
 	}
 	
 	@Override
+	public void onClTick(ClientTickEvent event) {
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		//System.out.println("DGfh");
+		World world = player.world;
+		for (int x = -20; x <= 20; x++) {
+			for (int y = -20; y <= 20; y++) {
+				for (int z = -20; z <= 20; z++) {
+					ServerPos pos = new ServerPos(player.getPosition().add(x, y, z), world.provider.getDimension());
+					for (UUID uu : this.getFavorPerPlayer().keySet()) {
+						if (this.teleporters.get(uu) != null) {
+							ArrayList<ServerPos> arr = teleporters.get(uu);
+							for (int i = 0; i < arr.size(); i++) {
+								if (arr.get(i).equalsWithoutName(pos)) {
+									RandomnessUtils.spawnParticles(EnumParticleTypes.END_ROD, world, pos, 3);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+
+	@Override
 	public void onDevoutPlaceBlock(EntityPlaceEvent event) {
 		if (this.isDead()) return;
 		if (rainSummoner.hasAbility(event.getEntity().getPersistentID()) && rainAltarConfiguration(event.getWorld(), event.getPos())) {
 			event.getWorld().addWeatherEffect(new EntityDivineLightning(event.getWorld(), this, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), true, false));
 			rainAltars.add(new ServerPos(event.getPos(), event.getWorld().provider.getDimension()));
 		} else if (waterTeleport.hasAbility(event.getEntity().getPersistentID()) && teleportConfig(event.getWorld(), event.getPos())) {
+			System.out.println("SDfgh");
 			event.getWorld().addWeatherEffect(new EntityDivineLightning(event.getWorld(), this, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), true, false));
 			TileEntitySign sign = (TileEntitySign)event.getWorld().getTileEntity(event.getPos());
 			String name = TextFormatting.getTextWithoutFormattingCodes(sign.signText[0].getFormattedText());
-			NBTTagList list = this.getDevoutDataTag(event.getEntity().getPersistentID(), "teleporters", NBTTagList.class);
-			if (list == null) {
-				list = new NBTTagList();
-				list.appendTag((new ServerPos(event.getPos(), event.getWorld().provider.getDimension())).setName(name).toNBT());
-				this.getDevoutData(event.getEntity().getPersistentID()).setTag("teleporters", list);
-			}
+			teleporters.addServerPos(event.getEntity().getPersistentID(), new ServerPos(event.getPos(), event.getWorld().provider.getDimension()));
 		
 		}
 	}
@@ -258,20 +286,8 @@ public class DeityLeviathan extends Deity {
 	public void onBreakBlock(BreakEvent event) {
 		if (rainAltars.contains(new ServerPos(event.getPos(), event.getWorld().provider.getDimension())) || rainAltars.contains(new ServerPos(event.getPos().up(), event.getWorld().provider.getDimension()))) {
 			rainAltars.remove(new ServerPos(event.getPos(), event.getWorld().provider.getDimension()));
-		} else {
-			for (UUID dev : this.getFavorPerPlayer().keySet()) {
-				NBTTagList list = this.getDevoutDataTag(dev, "teleporters", NBTTagList.class);
-				if (list != null) {	
-					for (int i = 0; i < list.tagCount(); i++) {
-						NBTTagCompound comp = list.getCompoundTagAt(i);
-						ServerPos pos = ServerPos.fromNBT(comp);
-						if (pos.equals(event.getPos()) || pos.equals(event.getPos().up())) {
-							list.removeTag(i);
-							System.out.println("Removed");
-						}
-					}
-				}
-			}
+		} else if (teleporters.hasServerPos(event.getPlayer().getPersistentID(), new ServerPos(event.getPos(), event.getWorld().provider.getDimension()))) {
+			teleporters.removeServerPos(event.getPlayer().getPersistentID(), new ServerPos(event.getPos(), event.getWorld().provider.getDimension()));
 		}
 		super.onBreakBlock(event);
 	}
@@ -299,13 +315,12 @@ public class DeityLeviathan extends Deity {
 			if (!this.getFavorPerPlayer().isEmpty()) {
 				for (UUID uu : this.getFavorPerPlayer().keySet()) {
 					
-					NBTTagList teleporters = this.getDevoutDataTag(uu, "teleporters", NBTTagList.class);
+					ArrayList<ServerPos> teleporters = this.teleporters.get(uu);
 					System.out.println(teleporters);
 					
 					if (teleporters != null) {
-						for (int i = 0; i < teleporters.tagCount(); i++) {
-							NBTTagCompound comp_p$$ = teleporters.getCompoundTagAt(i);
-							ServerPos pos = ServerPos.fromNBT(comp_p$$);
+						for (int i = 0; i < teleporters.size(); i++) {
+							ServerPos pos = teleporters.get(i);
 							System.out.println("pos : " + pos);
 							
 							if (event.getPos().equals(pos.getPos())) {// && event.getEntityPlayer().getUniqueID().equals(uu)) {

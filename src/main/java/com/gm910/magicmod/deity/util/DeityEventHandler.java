@@ -11,6 +11,7 @@ import com.gm910.magicmod.init.PotionInit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,6 +21,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.item.ItemEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -155,7 +157,7 @@ public class DeityEventHandler {
 		if (world != null && player != null) {
 			for (Deity deity : MagicMod.deities().deities) {
 				if (deity.isDevout(Minecraft.getMinecraft().player)) {
-					List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, Minecraft.getMinecraft().player.getEntityBoundingBox().grow(10), en -> {
+					List<EntityLivingBase> entities = world.getEntities(EntityLivingBase.class, en -> {
 						
 					return deity.isDevout(en) && en != Minecraft.getMinecraft().player;
 					});
@@ -172,6 +174,15 @@ public class DeityEventHandler {
 						}
 					}
 				}
+				
+				if (deity.isDevout(player)) {
+					deity.onDevoutClTick(event);
+				} else if (deity.isEnemy(player)) {
+					deity.onEnemyClTick(event);
+				} else {
+					deity.onNormalClTick(event);
+				}
+				deity.onClTick(event);
 			}
 		}
 		
@@ -706,7 +717,5 @@ public class DeityEventHandler {
 			}
 		}
 	}
-	
-	
 
 }

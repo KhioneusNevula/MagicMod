@@ -19,7 +19,6 @@ import com.gm910.magicmod.MagicMod.EnumKey;
 import com.gm910.magicmod.blocks.BlockStatue;
 import com.gm910.magicmod.blocks.BlockStatue.EnumTypeStatue;
 import com.gm910.magicmod.blocks.BlockStatue.TileEntityStatue;
-import com.gm910.magicmod.deity.Deities;
 import com.gm910.magicmod.deity.entities.EntityDeity;
 import com.gm910.magicmod.deity.entities.EntityDeityProjection;
 import com.gm910.magicmod.deity.entities.RenderDeityBase;
@@ -55,6 +54,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -92,10 +92,10 @@ import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -331,6 +331,11 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 			}
 		}
 		return this;
+	}
+	
+	public boolean hasDevoutDataTag(UUID uu, String key) {
+		
+		return this.getDevoutDataTag(uu, key) != null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1900,12 +1905,36 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	
 	public Deity setPoints(UUID player, int points) {
 		boolean createData = false;
-		if (this.getPoints(player) == 0 && points != 0) {
+		int addTeam = 0;
+		if (this.getPoints(player) == 0 && points > 0) {
 			createData = true;
-		}
+			addTeam = 1;
+		} else if (this.getPoints(player) > 0 && points <= 0) {
+			addTeam = -1;
+		} 
 		this.favorPerPlayer.put(player, points);
+		
 		if (createData) {
 			this.resetDevoutData(player);
+		}
+		if (addTeam != 0) {
+			Scoreboard board = CommonProxy.getWorld(0).getScoreboard();
+			Entity playerEntity = CommonProxy.getServer().getEntityFromUuid(player);
+			if (addTeam == 1) {
+				String name = playerEntity.getCachedUniqueIdString();
+				if (playerEntity instanceof EntityPlayer) {
+					name = ((EntityPlayer) playerEntity).getGameProfile().getName();
+				}
+				board.addPlayerToTeam(playerEntity.getCachedUniqueIdString(), this.getUnlocName().getResourcePath());
+			} else {
+				if (board.getTeam(this.getUnlocName().getResourcePath()).getMembershipCollection().contains(playerEntity.getCachedUniqueIdString())) {
+					System.out.println("Removed");
+					board.removePlayerFromTeam(playerEntity.getCachedUniqueIdString(), board.getTeam(this.getUnlocName().getResourcePath()));
+				}
+			}
+		}
+		if (points == 0) {
+			this.favorPerPlayer.remove(player);
 		}
 		return this;
 	}
@@ -1930,6 +1959,7 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	}
 	
 	public Deity removeDevout(UUID player) {
+		this.setPoints(player, 0);
 		this.favorPerPlayer.remove(player);
 		this.worship.remove(player);
 		return this;
@@ -2284,6 +2314,18 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	public void onCraft(ItemCraftedEvent event) {
 	}
 	
+	public void onDevoutClTick(ClientTickEvent event) {
+	}
+	
+	public void onEnemyClTick(ClientTickEvent event) {
+	}
+	
+	public void onNormalClTick(ClientTickEvent event) {
+	}
+	
+	public void onClTick(ClientTickEvent event) {
+	}
+	
 	public void onDevoutPickup(ItemPickupEvent event) {
 		if (event.getStack().getItem() instanceof ItemStatue) {
 			
@@ -2362,7 +2404,7 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 	
 	public void notifyDevotion(EntityLivingBase base) {
 		if (isDevout(base)) {
-			onBecomeDevout(base);
+			//onBecomeDevout(base);
 			base.sendMessage(new TextComponentTranslation("deity.nowdevotedto", this.displayName));
 		} else if (isEnemy(base)) {
 			base.sendMessage(new TextComponentTranslation("deity.nowenemyto", this.displayName));
@@ -3302,6 +3344,80 @@ public abstract class Deity implements INBTSerializable<NBTTagCompound>, IInvent
 		
 	}
 
+	public static class UUIDtoServerPosList extends SerializableMap<UUID, ArrayList<ServerPos>> {
+
+		public UUIDtoServerPosList(Map<UUID, ArrayList<ServerPos>> initial) {
+			super(initial);
+			
+		}
+
+		@Override
+		public NBTTagCompound keyToNBT(UUID key, ArrayList<ServerPos> val, NBTTagCompound nbt) {
+			nbt.setUniqueId("UUID", key);
+			return nbt;
+		}
+
+		@Override
+		public UUID keyFromNBT(NBTTagCompound nbt, NBTTagCompound val) {
+			
+			return nbt.getUniqueId("UUID");
+		}
+
+		@Override
+		public NBTTagCompound valueToNBT(ArrayList<ServerPos> value, UUID key, NBTTagCompound nbt) {
+			NBTTagList poses = new NBTTagList();
+			if (!value.isEmpty()) {
+				for (ServerPos pos : value) {
+					poses.appendTag(pos.toNBT());
+				}
+			}
+			nbt.setTag("Positions", poses);
+			return nbt;
+		}
+
+		@Override
+		public ArrayList<ServerPos> valueFromNBT(NBTTagCompound nbt, NBTTagCompound key) {
+			ArrayList<ServerPos> poses = new ArrayList<ServerPos>();
+			NBTTagList list = nbt.getTagList("Positions", NBT.TAG_COMPOUND);
+			for (int i = 0; i < list.tagCount(); i++) {
+				poses.add(ServerPos.fromNBT(list.getCompoundTagAt(i)));
+			}
+			return poses;
+		}
+		
+		public ArrayList<ServerPos> init(UUID uu) {
+			if (this.get(uu) == null) {
+				this.put(uu, new ArrayList<ServerPos>());
+			}
+			return this.get(uu);
+		}
+		
+		public void addServerPos(UUID uu, ServerPos pos) {
+			this.init(uu).add(pos);
+		}
+		
+		public void removeServerPos(UUID uu, ServerPos pos) {
+			this.init(uu);
+			if (this.get(uu).isEmpty()) return;
+			for (ServerPos pos1 : this.get(uu)) {
+				if (pos1.equalsWithoutName(pos)) {
+					this.get(uu).remove(pos1);
+				}
+			}
+		}
+		
+		public boolean hasServerPos(UUID uu, ServerPos pos) {
+			this.init(uu);
+			if (this.get(uu).isEmpty()) return false;
+			for (ServerPos pos1 : this.get(uu)) {
+				if (pos.equalsWithoutName(pos1)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+	}
 	
 	public static class DivineInventory extends InventoryBasic {
 

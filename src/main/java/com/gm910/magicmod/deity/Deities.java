@@ -43,6 +43,7 @@ public class Deities {
 				SEAR = new DeityVillager(new ResourceLocation(MagicMod.MODID, "sear"), "Sear", false, false, new ItemStack(Items.EMERALD, 10))
 		
 		);
+		
 	}
 	
 	public Deity getByResourceLocation(ResourceLocation rl) {
